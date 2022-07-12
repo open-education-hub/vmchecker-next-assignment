@@ -12,10 +12,13 @@ variables:
 build:
   stage: build
   before_script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker build --pull -t $CONTAINER_RELEASE_IMAGE .
     - docker push $CONTAINER_RELEASE_IMAGE
+  only:
+    variables:
+      - $BUILD_DOCKER_IMAGE
 
 checker:
     stage: test
