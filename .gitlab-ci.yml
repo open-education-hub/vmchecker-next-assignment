@@ -1,3 +1,5 @@
 checker:
     image:
         name: jokeswar/perfect-assignment
+    script:
+        - echo ""
