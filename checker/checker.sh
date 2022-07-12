@@ -2,6 +2,9 @@
 
 cd "$(dirname "$0")" || exit 1
 
+# Mark for Moodle trace cleanup
+[ -n "$CI" ] && echo "VMCHECKER_TRACE_CLEANUP\n"
+
 EXECUTABLE="../src/perfect"
 TIMEOUT_DURATION=10
 
