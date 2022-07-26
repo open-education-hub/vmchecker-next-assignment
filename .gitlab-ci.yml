@@ -23,6 +23,6 @@ build:
 checker:
     stage: test
     image:
-        name: $CONTAINER_RELEASE_IMAGE
+        name: registry.gitlab.com/jokeswar/vmchecker-next-assignment
     script:
         - echo ""
