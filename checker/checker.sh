@@ -7,6 +7,8 @@ cd "$(dirname "$0")" || exit 1
 
 EXECUTABLE="../src/perfect"
 TIMEOUT_DURATION=10
+SCORE=0
+TOTAL_SCORE=0
 
 test_err()
 {
@@ -52,7 +54,6 @@ test_edge()
     return $?
 }
 
-
 setup()
 {
     pushd ../src > /dev/null || exit 1
@@ -68,31 +69,42 @@ cleanup()
 }
 
 test_fun_array=(                        \
-	test_err            "Name 1"    5   \
-	test_single         "Name 2"    5   \
-	test_multiple       "Name 3"    5   \
-	test_edge           "Name 4"    5   \
+	test_err            "Name 1"    25  \
+	test_single         "Name 2"    25  \
+	test_multiple       "Name 3"    25  \
+	test_edge           "Name 4"    25  \
 )
+
+run_test()
+{
+    test_index="$1"
+    test_func_index=$((test_index * 3))
+    description=${test_fun_array[$((test_func_index + 1))]}
+    points=${test_fun_array[$((test_func_index + 2))]}
+    TOTAL_SCORE=$((TOTAL_SCORE + points))
+
+    echo -ne "Testing\t\t$description\t"
+    if ${test_fun_array["$test_func_index"]} ; then
+        SCORE=$((SCORE + points))
+        echo "$points/$points"
+    else
+        echo "0/$points"
+    fi
+}
 
 test_all()
 {
-    local score=0
-
     for i in $(seq 0 "$((${#test_fun_array[@]} / 3 - 1))") ; do
-        test_index=$((i * 3))
-        description=${test_fun_array[$((test_index + 1))]}
-        points=${test_fun_array[$((test_index + 2))]}
-
-
-        echo -e "Testing\t\t$description"
-        if ${test_fun_array["$test_index"]} ; then
-            score=$((score + points))
-        fi
+        run_test "$i"
     done
 
-    echo -e "\nTotal: $score"
+    echo -e "\nTotal: $SCORE/$TOTAL_SCORE"
 }
 
 setup
-test_all
+if [ -z "$1" ] ; then
+    test_all
+else
+    run_test "$1"
+fi
 cleanup
