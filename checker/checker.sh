@@ -87,8 +87,10 @@ run_test()
     if ${test_fun_array["$test_func_index"]} ; then
         SCORE=$((SCORE + points))
         echo "$points/$points"
+        return 0
     else
         echo "0/$points"
+        return 1
     fi
 }
 
@@ -106,5 +108,6 @@ if [ -z "$1" ] ; then
     test_all
 else
     run_test "$1"
+    exit $?
 fi
 cleanup
