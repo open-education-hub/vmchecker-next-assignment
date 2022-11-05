@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd "$(dirname "$0")" || exit 1
-
 # Mark for Moodle trace cleanup
 [ -n "$CI" ] && echo "VMCHECKER_TRACE_CLEANUP"
 
