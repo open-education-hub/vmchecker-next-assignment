@@ -23,6 +23,6 @@ build:
 checker:
     stage: test
     image:
-        name: registry.gitlab.com/jokeswar/vmchecker-next-assignment
+        name: gitlab.cs.pub.ro:5050/jokeswar/vmchecker-next-assignment
     script:
         - echo ""

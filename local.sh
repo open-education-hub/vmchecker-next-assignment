@@ -11,7 +11,7 @@ NC='\033[0m'
 
 DEFAULT_IMAGE_NAME="$(basename "$(pwd)")"
 DEFAULT_TAG='latest'
-DEFAULT_REGISTRY='registry.gitlab.cs.pub.ro'
+DEFAULT_REGISTRY='gitlab.cs.pub.ro:5050'
 
 #=============================================================================
 #=================================== UTILS ===================================
@@ -43,24 +43,24 @@ print_help() {
     echo ""
     echo "      --image_name <image_name> - the name of the image (default: current directory name)"
     echo "      --tag <tag> - the tag of the image (default: 'latest')"
-    echo "      --registry <registry> - the registry in which the image will be pushed (default: 'registry.gitlab.cs.pub.ro')"
+    echo "      --registry <registry> - the registry in which the image will be pushed (default: 'gitlab.cs.pub.ro:5050')"
     echo ""
     echo "local.sh docker push --user <user> --token <token> [--image_name <image_name>] [--tag <tag>] [--registry <registry>]"
     echo ""
     echo "      --image_name <image_name> - the name of the image (default: current directory name)"
     echo "      --tag <tag> - the tag of the image (default: 'latest')"
-    echo "      --registry <registry> - the registry in which the image will be pushed (default: 'registry.gitlab.cs.pub.ro')"
+    echo "      --registry <registry> - the registry in which the image will be pushed (default: 'gitlab.cs.pub.ro:5050')"
     echo "      --user <registry> - username for the repository registry"
-    echo "      --token <registry> - the registry in which the image will be pushed (default: 'registry.gitlab.cs.pub.ro')"
+    echo "      --token <registry> - the registry in which the image will be pushed (default: 'gitlab.cs.pub.ro:5050')"
     echo ""
     echo "local.sh docker test [--full_image_name <full_image_name>] [argumets_for_checker]"
     echo ""
-    echo "      --full_image_name <full_image_name> - the full name of the image (default: registry.gitlab.cs.pub.ro/<current_directory_name>:latest)"
+    echo "      --full_image_name <full_image_name> - the full name of the image (default: gitlab.cs.pub.ro:5050/<current_directory_name>:latest)"
     echo "      argumets_for_checker - list of space separated arguments to be passed to the checker"
     echo ""
     echo "local.sh docker interactive [--full_image_name <full_image_name>] [--use_executable <executbale>]"
     echo ""
-    echo "      --full_image_name <full_image_name> - the full name of the image (default: registry.gitlab.cs.pub.ro/<current_directory_name>:latest)"
+    echo "      --full_image_name <full_image_name> - the full name of the image (default: gitlab.cs.pub.ro:5050/<current_directory_name>:latest)"
     echo "      --use_executable <executable> - command to run inside the container (default: /bin/bash)"
     echo ""
     echo "local.sh checker [--remove_image] [--use_existing_image <image_name>] [argumets_for_checker]"
