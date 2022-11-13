@@ -231,9 +231,14 @@ checker_main() {
     cp -R ./* "$tmpdir"
 
     LOG_INFO "Running checker..."
+
+    # In your checker script if you must use absolute paths please use $CI_PROJECT_DIR to reference the location of your directory,
+    # otherwise stick to relative paths.
+    # It is guaranteed that the current working directory in which checker.sh will run is  $CI_PROJECT_DIR/checker.
+    project_directory="/build/$USER/$(basename "$(pwd)")"
     docker run --rm \
-            --mount type=bind,source="$tmpdir",target=/build \
-            "$image_name" /bin/bash -c "rm -rf /usr/local/bin/bash; /build/checker/checker.sh \"${script_args[@]}\"" # remove bash middleware script
+            --mount type=bind,source="$tmpdir",target="$project_directory" \
+            "$image_name" /bin/bash -c "rm -rf /usr/local/bin/bash; cd \"$project_directory/checker\"; \"$project_directory/checker/checker.sh\" \"${script_args[@]}\"" # remove bash middleware script
 
     if [ -n "$remove_image" ] ; then
         LOG_INFO "Cleaning up..."
