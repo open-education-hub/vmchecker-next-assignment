@@ -13,6 +13,8 @@ DEFAULT_IMAGE_NAME="$(basename "$(pwd)")"
 DEFAULT_TAG='latest'
 DEFAULT_REGISTRY='gitlab.cs.pub.ro:5050'
 
+MOUNT_PROJECT_DIRECTORY="/build/$USER/$(basename "$(pwd)")"
+
 #=============================================================================
 #=================================== UTILS ===================================
 #=============================================================================
@@ -185,7 +187,8 @@ docker_interactive() {
     cp -R ./* "$tmpdir"
 
     docker run --rm -it \
-            --mount type=bind,source="$tmpdir",target=/build \
+            --mount type=bind,source="$tmpdir",target="$MOUNT_PROJECT_DIRECTORY" \
+            --workdir "$MOUNT_PROJECT_DIRECTORY" \
             "$full_image_name" "$executable"
 }
 
@@ -210,7 +213,6 @@ checker_main() {
     local remove_image=''
     local image_name=''
     local extra_docker_args=()
-    local project_directory=''
 
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -246,10 +248,9 @@ checker_main() {
     # In your checker script if you must use absolute paths please use $CI_PROJECT_DIR to reference the location of your directory,
     # otherwise stick to relative paths.
     # It is guaranteed that the current working directory in which checker.sh will run is  $CI_PROJECT_DIR/checker.
-    project_directory="/build/$USER/$(basename "$(pwd)")"
     docker run --rm \
-            --mount type=bind,source="$tmpdir",target="$project_directory" \
-            "$image_name" /bin/bash -c "rm -rf /usr/local/bin/bash; cd \"$project_directory/checker\"; \"$project_directory/checker/checker.sh\" \"${script_args[@]}\"" # remove bash middleware script
+            --mount type=bind,source="$tmpdir",target="$MOUNT_PROJECT_DIRECTORY" \
+            "$image_name" /bin/bash -c "rm -rf /usr/local/bin/bash; cd \"$MOUNT_PROJECT_DIRECTORY/checker\"; \"$MOUNT_PROJECT_DIRECTORY/checker/checker.sh\" \"${script_args[@]}\"" # remove bash middleware script
 
     if [ -n "$remove_image" ] ; then
         LOG_INFO "Cleaning up..."
