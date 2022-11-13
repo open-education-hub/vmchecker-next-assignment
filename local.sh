@@ -39,11 +39,12 @@ print_help() {
     echo "      checker - runs the checker"
     echo "      -h|--help - prints this message"
     echo ""
-    echo "local.sh docker build [--image_name <image_name>] [--tag <tag>] [--registry <registry>]"
+    echo "local.sh docker build [--image_name <image_name>] [--tag <tag>] [--registry <registry>] [--force_build]"
     echo ""
     echo "      --image_name <image_name> - the name of the image (default: current directory name)"
     echo "      --tag <tag> - the tag of the image (default: 'latest')"
     echo "      --registry <registry> - the registry in which the image will be pushed (default: 'gitlab.cs.pub.ro:5050')"
+    echo "      --force_build - disable caching when building the docker image"
     echo ""
     echo "local.sh docker push --user <user> --token <token> [--image_name <image_name>] [--tag <tag>] [--registry <registry>]"
     echo ""
@@ -51,7 +52,7 @@ print_help() {
     echo "      --tag <tag> - the tag of the image (default: 'latest')"
     echo "      --registry <registry> - the registry in which the image will be pushed (default: 'gitlab.cs.pub.ro:5050')"
     echo "      --user <registry> - username for the repository registry"
-    echo "      --token <registry> - the registry in which the image will be pushed (default: 'gitlab.cs.pub.ro:5050')"
+    echo "      --token <token> - the token used to authenticate in the docker registry"
     echo ""
     echo "local.sh docker test [--full_image_name <full_image_name>] [argumets_for_checker]"
     echo ""
@@ -63,10 +64,11 @@ print_help() {
     echo "      --full_image_name <full_image_name> - the full name of the image (default: gitlab.cs.pub.ro:5050/<current_directory_name>:latest)"
     echo "      --use_executable <executable> - command to run inside the container (default: /bin/bash)"
     echo ""
-    echo "local.sh checker [--remove_image] [--use_existing_image <image_name>] [argumets_for_checker]"
+    echo "local.sh checker [--remove_image] [--use_existing_image <image_name>] [--force_build] [argumets_for_checker]"
     echo ""
     echo "      --remove_image - remove the checker's docker image after the run"
     echo "      --use_existing_image - user image_name instead of building the image from current directory"
+    echo "      --force_build - disable caching when building the docker image"
     echo "      argumets_for_checker - list of space separated arguments to be passed to the checker"
     echo ""
 }
@@ -75,6 +77,7 @@ docker_build() {
     local image_name="$DEFAULT_IMAGE_NAME"
     local tag="$DEFAULT_TAG"
     local registry="$DEFAULT_REGISTRY"
+    local extra_docker_args=()
 
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -90,13 +93,16 @@ docker_build() {
                 shift
                 registry="$1"
             ;;
+            --force_build)
+                extra_docker_args+=('--no-cache')
+            ;;
         esac
         shift
     done
 
     LOG_INFO "Building Docker image..."
 
-    docker image build -t "${registry}/${image_name}:${tag}" .
+    docker image build "${extra_docker_args[@]}" -t "${registry}/${image_name}:${tag}" .
 }
 
 docker_push() {
@@ -203,6 +209,8 @@ checker_main() {
     local script_args=()
     local remove_image=''
     local image_name=''
+    local extra_docker_args=()
+    local project_directory=''
 
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -212,6 +220,9 @@ checker_main() {
             --use_existing_image)
                 shift
                 image_name="$1"
+            ;;
+            --force_build)
+                extra_docker_args+=('--no-cache')
             ;;
             *)
                 script_args+=("$1")
@@ -224,7 +235,7 @@ checker_main() {
         image_name="$(basename "$(pwd)")"
 
         LOG_INFO "Building image..."
-        docker build -q -t "$image_name" .
+        docker build "${extra_docker_args[@]}" -q -t "$image_name" .
     fi
 
     tmpdir="$(mktemp -d)"
